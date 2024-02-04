@@ -15,28 +15,22 @@ const crypto = require("crypto");
 
 const saltRounds = 10;
 
-const seedDatabase = async () => {
-    // create company first to add the company ID to the user profile
-    const company = await Company.create({ name: "Acme Corporation", accessToken: crypto.randomBytes(20).toString('hex') });
+const seedDatabase = async (user) => {
 
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hashedPassword = bcrypt.hashSync("123456", salt);
-    // Create a new user in the database
-    const createdUser = await User.create({ email: "admin@acme.com", password: hashedPassword, name: "admin", company: company._id });
 
     const feedbackEntries = feedbackData.map(entry => {
         const createdAt = new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000));
         return ({
             rating: entry.rating,
             feedback: entry.feedback,
-            company: company._id,
+            company: user.company,
             createdAt: createdAt
         })
     })
 
     await Feedback.insertMany(feedbackEntries);
     console.log("done...")
-    process.exit(0);
+    
 }
 
-seedDatabase();
+module.exports = seedDatabase;

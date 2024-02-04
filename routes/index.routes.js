@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 const uploader = require('../middleware/cloudinary.config.js');
 const User = require("../models/User.model");
+const seedDatabase = require("../data/seedDatabase.js");
 
 router.get("/", (req, res, next) => {
   res.json("All good in here");
@@ -30,6 +31,17 @@ router.get("/image" , isAuthenticated, async (req, res) => {
     const { _id } = req.payload;
     const user = await User.findById({_id});
     res.status(200).json({image: user.image})
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.get("/seed", isAuthenticated, async (req, res) => {
+  try {
+    const { _id } = req.payload;
+    const user = await User.findById({_id});
+    seedDatabase(user);
+    res.status(200).json({message: "Seeding successful"})
   } catch (error) {
     console.log(error)
   }
